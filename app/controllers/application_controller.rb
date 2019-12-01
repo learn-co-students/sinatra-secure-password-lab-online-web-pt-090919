@@ -3,45 +3,53 @@ require "./app/models/user"
 class ApplicationController < Sinatra::Base
 
   configure do
-    set :views, "app/views"
-    enable :sessions
-    set :session_secret, "password_security"
+    set(:views, "app/views")
+    enable(:sessions)
+    set(:session_secret, "password_security")
   end
 
   get "/" do
-    erb :index
+    erb(:index)
   end
 
   get "/signup" do
-    erb :signup
+    erb(:signup)
   end
 
   post "/signup" do
-    #your code here
-
+    @user = User.new(username: params[:username], password: params[:password])
+    if @user.username.empty? || @user.password.nil?
+      redirect(:"/failure")
+    else
+      redirect(:"/login")
+    end
   end
 
   get '/account' do
-    @user = User.find(session[:user_id])
-    erb :account
+    erb(:account)
   end
 
 
   get "/login" do
-    erb :login
+    erb(:login)
   end
 
   post "/login" do
-    ##your code here
+    @user = User.find_by(username: params[:username])
+    if @user && @user.authenticate(params[:password])
+      redirect("/account")
+    else
+      redirect("/failure")
+    end
   end
 
   get "/failure" do
-    erb :failure
+    erb(:failure)
   end
 
   get "/logout" do
     session.clear
-    redirect "/"
+    redirect("/")
   end
 
   helpers do
