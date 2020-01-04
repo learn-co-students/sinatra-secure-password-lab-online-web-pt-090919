@@ -18,12 +18,24 @@ class ApplicationController < Sinatra::Base
 
   post "/signup" do
     #your code here
-
+    # displays the failure page if no username/ password is given
+    # displays the log in page if username and password is given
+    
+    user = User.new(:username => params[:username], :password => params[:password])
+   
+    # won't be saved to the db unless our user filled out the password field
+    if user.save
+      redirect "/login"
+    else
+      redirect "/failure"
+    end
   end
 
   get '/account' do
     @user = User.find(session[:user_id])
-    erb :account
+    if logged_in?
+      erb :account
+    end
   end
 
 
@@ -33,6 +45,16 @@ class ApplicationController < Sinatra::Base
 
   post "/login" do
     ##your code here
+    # displays the failure page if no username/ password is given
+    # displays the user's account page if username and password is given
+    user = User.find_by(:username => params[:username])
+   
+    if user && user.authenticate(params[:password])
+      session[:user_id] = user.id
+      redirect "/account"
+    else
+      redirect "/failure"
+    end
   end
 
   get "/failure" do
