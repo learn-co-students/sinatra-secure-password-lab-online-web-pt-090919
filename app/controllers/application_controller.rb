@@ -38,7 +38,6 @@ class ApplicationController < Sinatra::Base
     end
   end
 
-
   get "/login" do
     erb :login
   end
@@ -65,7 +64,25 @@ class ApplicationController < Sinatra::Base
     session.clear
     redirect "/"
   end
-
+  
+  post '/withdrawal' do
+  end
+  
+  post '/deposit' do
+      
+  end
+  
+  
+  get '/edit' do
+    @user = user.find(params[:user_id])
+    erb :edit
+  end
+  
+  patch '/edit' do
+    User.update(params[:user_id], params[:balance])
+    redirect "/articles/#{id}"
+  end
+  
   helpers do
     def logged_in?
       !!session[:user_id]
